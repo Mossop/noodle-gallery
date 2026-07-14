@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { lazyComponent } from '$lib/utils/lazy-component.svelte';
   import ImageThumbnail from '$lib/components/assets/thumbnail/ImageThumbnail.svelte';
   import PersonIndicator from '$lib/components/faces-page/PersonIndicator.svelte';
   import UserPageLayout from '$lib/components/layouts/UserPageLayout.svelte';
@@ -68,6 +69,10 @@
   const getPersonHref = (person: PersonResponseDto) => getGlobalPersonHref(person, Route.explore());
 
   const getPersonThumbnail = (person: PersonResponseDto) => getGlobalPersonThumbnailUrl(person);
+
+  // Mounting the viewer through `{#await}` leaves it permanently unreactive on reopen.
+  // See lazyComponent().
+  const LazyAssetViewer = lazyComponent(() => import('$lib/components/asset-viewer/AssetViewer.svelte'));
 </script>
 
 <OnEvents {onPersonThumbnailReady} />
@@ -185,7 +190,8 @@
 </UserPageLayout>
 
 {#if assetViewerManager.isViewing}
-  {#await import('$lib/components/asset-viewer/AssetViewer.svelte') then { default: AssetViewer }}
+  {#if LazyAssetViewer.current}
+    {@const AssetViewer = LazyAssetViewer.current}
     <Portal target="body">
       <AssetViewer
         cursor={assetCursor}
@@ -193,5 +199,5 @@
         onClose={() => assetViewerManager.showAssetViewer(false)}
       />
     </Portal>
-  {/await}
+  {/if}
 {/if}
