@@ -1824,7 +1824,7 @@ describe(MetadataService.name, () => {
       mocks.systemMetadata.get.mockResolvedValue({ metadata: { faces: { import: true } } });
       mockReadTags(makeFaceTags({ Name: person.name }));
       mocks.person.getDistinctNames.mockResolvedValue([]);
-      mocks.person.createAll.mockResolvedValue([person.id]);
+      mocks.person.createAll.mockResolvedValue([person.personGroupId]);
       mocks.faceIdentity.ensurePersonIdentity.mockResolvedValue({ id: 'identity-1' } as any);
 
       await sut.handleMetadataExtraction({ id: asset.id });
@@ -1846,7 +1846,7 @@ describe(MetadataService.name, () => {
       mocks.systemMetadata.get.mockResolvedValue({ metadata: { faces: { import: true } } });
       mockReadTags(makeFaceTags({ Name: person.name }));
       mocks.person.getDistinctNames.mockResolvedValue([]);
-      mocks.person.createAll.mockResolvedValue([person.id]);
+      mocks.person.createAll.mockResolvedValue([person.personGroupId]);
       mocks.faceIdentity.ensurePersonIdentity.mockResolvedValue({ id: 'identity-1' } as any);
       mocks.sharedSpace.getSpaceIdsForAsset.mockResolvedValue([{ spaceId: 'space-1' }]);
 
@@ -1871,7 +1871,7 @@ describe(MetadataService.name, () => {
       mocks.systemMetadata.get.mockResolvedValue({ metadata: { faces: { import: true } } });
       mockReadTags(makeFaceTags({ Name: person.name }));
       mocks.person.getDistinctNames.mockResolvedValue([]);
-      mocks.person.createAll.mockResolvedValue([person.id]);
+      mocks.person.createAll.mockResolvedValue([person.personGroupId]);
       mocks.faceIdentity.ensurePersonIdentity.mockResolvedValue({ id: 'identity-1' } as any);
       mocks.sharedSpace.getSpaceIdsForAsset.mockResolvedValue([]);
 
@@ -1881,7 +1881,7 @@ describe(MetadataService.name, () => {
       expect(mocks.job.queueAll).toHaveBeenCalledExactlyOnceWith([
         {
           name: JobName.PersonGenerateThumbnail,
-          data: { id: person.id },
+          data: { id: person.personGroupId },
         },
       ]);
       expect(mocks.job.queueAll).not.toHaveBeenCalledWith(
@@ -1898,7 +1898,7 @@ describe(MetadataService.name, () => {
       mocks.systemMetadata.get.mockResolvedValue({ metadata: { faces: { import: true } } });
       mockReadTags(makeFaceTags({ Name: person.name }));
       mocks.person.getDistinctNames.mockResolvedValue([]);
-      mocks.person.createAll.mockResolvedValue([person.id]);
+      mocks.person.createAll.mockResolvedValue([person.personGroupId]);
       mocks.faceIdentity.ensurePersonIdentity.mockResolvedValue({ id: 'identity-1' } as any);
       mocks.sharedSpace.getSpaceIdsForAsset.mockResolvedValue([{ spaceId: 'space-1' }, { spaceId: 'space-2' }]);
 
@@ -1907,7 +1907,7 @@ describe(MetadataService.name, () => {
       expect(mocks.job.queueAll).toHaveBeenNthCalledWith(1, [
         {
           name: JobName.PersonGenerateThumbnail,
-          data: { id: person.id },
+          data: { id: person.personGroupId },
         },
       ]);
       expect(mocks.job.queueAll).toHaveBeenNthCalledWith(2, [
@@ -1928,7 +1928,7 @@ describe(MetadataService.name, () => {
       mocks.assetJob.getForMetadataExtraction.mockResolvedValue(asset as any);
       mocks.systemMetadata.get.mockResolvedValue({ metadata: { faces: { import: true } } });
       mockReadTags(makeFaceTags({ Name: person.name }));
-      mocks.person.getDistinctNames.mockResolvedValue([{ id: person.id, name: person.name }]);
+      mocks.person.getDistinctNames.mockResolvedValue([{ id: person.personGroupId, name: person.name }]);
       mocks.person.createAll.mockResolvedValue([]);
 
       await sut.handleMetadataExtraction({ id: asset.id });
@@ -1971,7 +1971,7 @@ describe(MetadataService.name, () => {
         [],
       );
       expect(mocks.person.updateAll).not.toHaveBeenCalled();
-      expect(mocks.faceIdentity.ensurePersonIdentity).toHaveBeenCalledWith(person.id);
+      expect(mocks.faceIdentity.ensurePersonIdentity).toHaveBeenCalledWith(person.personGroupId);
       expect(mocks.faceIdentity.replaceFaceIdentity).toHaveBeenCalledWith({
         assetFaceId: 'random-uuid',
         identityId: 'identity-1',
