@@ -93,7 +93,13 @@
           {#each people.slice(0, itemCount) as person (person.id)}
             <a href={getPersonHref(person)} class="text-center">
               <div class="@container relative">
-                <ImageThumbnail circle shadow url={getPersonThumbnail(person)} altText={person.name} widthStyle="100%" />
+                <ImageThumbnail
+                  circle
+                  shadow
+                  url={getPersonThumbnail(person)}
+                  altText={person.name}
+                  widthStyle="100%"
+                />
                 <PersonIndicator {person} />
               </div>
               <p class="mt-2 text-sm font-medium text-ellipsis dark:text-white">{person.name}</p>
