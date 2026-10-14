@@ -46,7 +46,6 @@ export type Library = {
   ownerId: string;
   createdAt: Date;
   updatedAt: Date;
-  createId: string;
   updateId: string;
   name: string;
   importPaths: string[];
@@ -169,8 +168,8 @@ export type AuthSharedLink = {
   expiresAt: Date | null;
   userId: string;
   albumId: string | null;
-  /** #1018: the space this link was created from; the tether for non-owned assets. */
-  spaceId: string | null;
+  /** #1018: the space this link was created from (`shared_link_space`); the tether for non-owned assets. */
+  spaceId?: string | null;
   showExif: boolean;
   allowUpload: boolean;
   allowDownload: boolean;
@@ -193,7 +192,6 @@ export type SharedLink = {
   type: SharedLinkType;
   userId: string;
   slug: string | null;
-  spaceId: string | null;
 };
 
 export type Album = Selectable<AlbumTable> & {
@@ -284,7 +282,6 @@ export type AssetFace = {
   ownerId: string;
   assetVisibility: AssetVisibility;
   assetDeletedAt: Date | null;
-  createdBy: string | null;
 };
 
 export type Plugin = Selectable<PluginTable>;
