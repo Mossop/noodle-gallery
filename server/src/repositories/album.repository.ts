@@ -15,6 +15,7 @@ import { columns } from 'src/database.js';
 import { Chunked, ChunkedArray, ChunkedSet, DummyValue, GenerateSql } from 'src/decorators.js';
 import { AlbumUserCreateDto, MapAlbumDto } from 'src/dtos/album.dto.js';
 import { AlbumUserRole } from 'src/enum.js';
+import { albumCoverIsLiveContribution } from 'src/gallery/utils/album-cover.js';
 import { projectedDuration } from 'src/gallery/utils/projected-duration.js';
 import { DB } from 'src/schema/index.js';
 import { AlbumTable } from 'src/schema/tables/album.table.js';
@@ -518,6 +519,7 @@ export class AlbumRepository {
                   .whereRef('album.albumThumbnailAssetId', '=', 'album_asset.assetId'), // Has invalid assets
               ),
             ),
+            eb.not(albumCoverIsLiveContribution(eb)),
           ]),
         ]),
       )
