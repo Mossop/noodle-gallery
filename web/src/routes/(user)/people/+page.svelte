@@ -12,6 +12,7 @@
   import UserPageLayout from '$lib/components/layouts/UserPageLayout.svelte';
   import OnEvents from '$lib/components/OnEvents.svelte';
   import { PEOPLE_PAGE_SIZE, QueryParameter, SessionStorageKey } from '$lib/constants';
+  import { searchPeopleWithSharedSpaces } from '$lib/gallery/people/space-person-name-merge';
   import { authManager } from '$lib/managers/auth-manager.svelte';
   import { featureFlagsManager } from '$lib/managers/feature-flags-manager.svelte';
   import PersonMergeSuggestionModal from '$lib/modals/PersonMergeSuggestionModal.svelte';
@@ -29,14 +30,7 @@
   import { peopleFilterToTypeParam as filterToTypeParam, resolvePeopleFilterBy } from '$lib/utils/people-filter';
   import { appendUniqueById, sortPeople } from '$lib/utils/people-utils';
   import { formatPeopleHeaderDescription } from '$lib/utils/people-statistics';
-  import {
-    getAllPeople,
-    getPeopleFaceStatistics,
-    getPerson,
-    searchPerson,
-    updatePerson,
-    type PersonResponseDto,
-  } from '@immich/sdk';
+  import { getAllPeople, getPeopleFaceStatistics, getPerson, searchPerson, type PersonResponseDto } from '@immich/sdk';
   import { Button, Icon, modalManager, toastManager } from '@immich/ui';
   import {
     mdiAccountMultipleCheckOutline,
@@ -174,7 +168,7 @@
     }
   };
 
-  const handleMerge = async () => {
+  const handleMerge = async ({ renameOnDecline = true }: { renameOnDecline?: boolean } = {}) => {
     if (!editingPerson || !personMerge1 || !personMerge2) {
       return;
     }
@@ -186,7 +180,9 @@
     });
 
     if (!response) {
-      await updateName(personMerge1, newName);
+      if (renameOnDecline) {
+        await updateName(personMerge1, newName);
+      }
       return;
     }
 
@@ -205,7 +201,8 @@
        *
        */
       try {
-        await updatePerson({ id: personToBeMergedInto.id, personUpdateDto: { name: newName } });
+        // Routed by profile: a space person's name lives on the space endpoint, not the owner-only one.
+        await updatePersonName(personToBeMergedInto, newName);
 
         for (const person of people) {
           if (person.id === personToBeMergedInto.id) {
@@ -370,11 +367,6 @@
         return;
       }
 
-      if (!isPersonalPrimary(targetPerson)) {
-        await updateName(targetPerson, name);
-        return;
-      }
-
       if (name === '') {
         await updateName(targetPerson, '');
         return;
@@ -408,8 +400,24 @@
     newName = '';
   };
 
+  // Picking a suggestion is an explicit "same person" choice, so declining the merge leaves the name alone
+  // rather than renaming to the suggestion's name the way a typed exact match does.
+  const onSuggestionSelect = async (suggestion: PersonResponseDto, targetPerson: PersonResponseDto) => {
+    editingPerson = targetPerson;
+    newName = suggestion.name;
+    personMerge1 = targetPerson;
+    personMerge2 = suggestion;
+    potentialMergePeople = [];
+    try {
+      await handleMerge({ renameOnDecline: false });
+    } catch (error) {
+      handleError(error, $t('errors.unable_to_save_name'));
+    }
+  };
+
   const findPeopleWithSimilarName = async (name: string, personId: string) => {
-    const searchResult = await searchPerson({ name, withHidden: true });
+    // Shared-space people too: an editor naming a space person owns none of the existing ones (#1100).
+    const searchResult = await searchPerson({ name, withHidden: true, withSharedSpaces: true });
     const normalizedName = normalizeSearchString(name);
     return searchResult.find(
       (person) => normalizeSearchString(person.name) === normalizedName && person.id !== personId && person.name,
@@ -507,6 +515,8 @@
       canEditNames={canEditName}
       canShowActions={isPersonalPrimary}
       onNameSubmit={onNameChangeSubmit}
+      searchNameSuggestions={searchPeopleWithSharedSpaces}
+      {onSuggestionSelect}
     >
       {#snippet actions(person)}
         {@const Actions = getPersonActions($t, person)}
