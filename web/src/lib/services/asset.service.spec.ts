@@ -280,16 +280,6 @@ describe('add to album/space entry points', () => {
     action.onAction({ action, event: new Event('click') });
     expect(modalManager.show).toHaveBeenCalledWith(AssetAddToCollectionModal, {
       assetIds: ['x1', 'x2'],
-      restrictToSpaceId: undefined,
-    });
-  });
-
-  it('bulk "+" carries the space restriction through to the modal when the selection is not all-owned', () => {
-    const action = getAssetBulkActions(((k: string) => k) as never, { restrictToSpaceId: 'space-1' }).AddToAlbum;
-    action.onAction({ action, event: new Event('click') });
-    expect(modalManager.show).toHaveBeenCalledWith(AssetAddToCollectionModal, {
-      assetIds: ['x1', 'x2'],
-      restrictToSpaceId: 'space-1',
     });
   });
 
@@ -310,7 +300,7 @@ describe('add to album/space entry points', () => {
     beforeEach(() => authManager.setPreferences(preferencesFactory.build()));
     afterEach(() => authManager.reset());
 
-    it('narrows the picker to the space when a space editor opens a photo they do not own', () => {
+    it('opens the same picker as the timeline when a space editor opens a photo they do not own (#1119)', () => {
       authManager.setUser(userAdminFactory.build({ id: 'editor-1' }));
       const asset = assetFactory.build({ id: 'not-mine', ownerId: 'someone-else' });
 
@@ -320,7 +310,6 @@ describe('add to album/space entry points', () => {
       expect(action.$if?.()).toBe(true);
       expect(modalManager.show).toHaveBeenCalledWith(AssetAddToCollectionModal, {
         assetIds: ['not-mine'],
-        restrictToSpaceId: 'space-1',
       });
     });
 
@@ -334,7 +323,6 @@ describe('add to album/space entry points', () => {
       expect(action.$if?.()).toBe(true);
       expect(modalManager.show).toHaveBeenCalledWith(AssetAddToCollectionModal, {
         assetIds: ['mine'],
-        restrictToSpaceId: undefined,
       });
     });
 
@@ -360,7 +348,6 @@ describe('add to album/space entry points', () => {
       expect(action.$if?.()).toBe(true);
       expect(modalManager.show).toHaveBeenCalledWith(AssetAddToCollectionModal, {
         assetIds: ['partners-photo'],
-        restrictToSpaceId: undefined,
       });
     });
   });
