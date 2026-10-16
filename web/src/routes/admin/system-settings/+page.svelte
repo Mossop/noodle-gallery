@@ -23,6 +23,7 @@
   import AdminPageLayout from '$lib/components/layouts/AdminPageLayout.svelte';
   import SettingAccordion from '$lib/components/shared-components/settings/SettingAccordion.svelte';
   import SearchBar from '$lib/elements/SearchBar.svelte';
+  import { adminSettingsSearch } from '$lib/gallery/admin-settings-search.svelte';
   import { featureFlagsManager } from '$lib/managers/feature-flags-manager.svelte';
   import { systemConfigManager } from '$lib/managers/system-config-manager.svelte';
   import { getSystemConfigActions } from '$lib/services/system-config.service';
@@ -228,12 +229,7 @@
 
   let searchQuery = $state('');
 
-  let filteredSettings = $derived(
-    settings.filter(({ title, subtitle }) => {
-      const query = searchQuery.toLowerCase();
-      return title.toLowerCase().includes(query) || subtitle.toLowerCase().includes(query);
-    }),
-  );
+  let filteredSettings = $derived(settings.filter((setting) => adminSettingsSearch.matches(setting, searchQuery, $t)));
 
   const { CopyToClipboard, Upload, Download } = $derived(
     getSystemConfigActions($t, featureFlagsManager.value, systemConfigManager.value),
