@@ -18,6 +18,7 @@
   import AssetSelectControlBar from '$lib/components/timeline/AssetSelectControlBar.svelte';
   import { QueryParameter } from '$lib/constants';
   import { parseSearchTerms } from '$lib/gallery/search/parse-search-terms';
+  import { searchHotkeyLabel } from '$lib/gallery/search/search-hotkey';
   import { assetMultiSelectManager } from '$lib/managers/asset-multi-select-manager.svelte';
   import { registerSelectionContext } from '$lib/managers/command-context-manager.svelte';
   import { featureFlagsManager } from '$lib/managers/feature-flags-manager.svelte';
@@ -453,7 +454,7 @@
             <div
               class="flex flex-wrap items-center gap-2 rounded-xl border border-gray-200/80 bg-white/90 px-4 py-2 text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-immich-dark-gray/90 dark:text-gray-200"
             >
-              <span>{$t('search_legacy_notice')}</span>
+              <span>{$t('search_legacy_notice', { values: { hotkey: searchHotkeyLabel() } })}</span>
               <button
                 type="button"
                 class="font-medium text-primary hover:text-primary/80 focus-visible:outline-2 focus-visible:outline-primary"
