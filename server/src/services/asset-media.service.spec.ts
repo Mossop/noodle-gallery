@@ -1254,7 +1254,7 @@ describe(AssetMediaService.name, () => {
       );
     });
 
-    it('should fall back to the original path', async () => {
+    it('should fall back to the original path, revalidated so a later encode replaces it (#1176)', async () => {
       const asset = AssetFactory.create({ type: AssetType.Video, originalPath: '/original/path.ext' });
       mocks.access.asset.checkOwnerAccess.mockResolvedValue(new Set([asset.id]));
       mocks.asset.getForVideo.mockResolvedValue({
@@ -1265,7 +1265,7 @@ describe(AssetMediaService.name, () => {
       await expect(sut.playbackVideo(authStub.admin, asset.id)).resolves.toEqual(
         new ImmichFileResponse({
           path: asset.originalPath,
-          cacheControl: CacheControl.PrivateWithCache,
+          cacheControl: CacheControl.PrivateWithoutCache,
           contentType: 'application/octet-stream',
         }),
       );
@@ -1297,7 +1297,7 @@ describe(AssetMediaService.name, () => {
             length: 1024,
             contentRange: 'bytes 0-1023/1048576',
             acceptsRanges: true,
-            cacheControl: CacheControl.PrivateWithCache,
+            cacheControl: CacheControl.PrivateWithoutCache,
           }),
         );
         expect(s3Backend.getServeStrategy).toHaveBeenCalledWith(
