@@ -511,6 +511,7 @@
       {toManagedPerson}
       hasNextPage={!!nextPage && !searchName}
       loading={loadingPage}
+      loadedPages={currentPage}
       {loadNextPage}
       canEditNames={canEditName}
       canShowActions={isPersonalPrimary}
