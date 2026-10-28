@@ -95,6 +95,7 @@ export const newAccessRepositoryMock = (): IAccessRepositoryMock => {
 
     spaceAsset: {
       checkSpaceAccess: vitest.fn().mockResolvedValue(new Set()),
+      checkSpaceStackAccess: vitest.fn().mockResolvedValue(new Set()),
       checkSpaceAccessForSpace: vitest.fn().mockResolvedValue(new Set()),
       checkSpaceEditAccess: vitest.fn().mockResolvedValue(new Set()),
     },
